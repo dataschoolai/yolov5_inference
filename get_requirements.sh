@@ -1,0 +1,1 @@
+wget https://raw.githubusercontent.com/ultralytics/yolov5/master/requirements.txt
