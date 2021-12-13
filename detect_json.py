@@ -1,6 +1,7 @@
 
 #Import image processing library
 import cv2
+from PIL import Image
 import numpy as np
 #Import libarary for file and directory handling
 from pathlib import Path
@@ -61,7 +62,8 @@ for path in tqdm(image_list[10:]):
     #Get label id 
     label_id = path.stem.split('.')[0]
     #Read image
-    image = cv2.imread(str(path))
+    # image = cv2.imread(str(path))
+    image = Image.open(path)
     #Get prediction from model
     prediction = model(image)
     #Get bounding boxes
@@ -73,7 +75,8 @@ for path in tqdm(image_list[10:]):
 
 
         #Get image width and height
-        height, width = image.shape[:2]
+        width, height = image.size
+        
 
         #Create a annotations dictionary
         annotations = {
@@ -111,12 +114,8 @@ for path in tqdm(image_list[10:]):
                 "bbox": bbox,
                 "score": confidence
                 })
-            img = draw_box(image, bbox)
-            #Save image
-            cv2.imwrite(str(output_img_path), img)
         #Create a label dictionary
 
-        print(annotations)
         prediction.files = [path.name]
         #Save prediction to file
         prediction.save('output')
