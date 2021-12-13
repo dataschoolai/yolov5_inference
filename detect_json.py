@@ -10,6 +10,9 @@ import torch
 from tqdm import tqdm
 import json
 import shutil
+#Import library to read command line arguments
+import argparse
+
 #Create a function to make directory for dataset
 def make_dirs(dir='new_dir/'):
     # Create folders
@@ -34,7 +37,7 @@ def draw_box(image, box:list, color=(0, 255, 0), thickness=2):
     return image
 
 #Define a function predict the bounding box of the image
-def predict(input_dir:Path,output_dir:Path,path_weight='best.pt'):
+def predict(input_dir:Path,output_dir:Path,path_weights='best.pt'):
 
     #Get device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -43,16 +46,18 @@ def predict(input_dir:Path,output_dir:Path,path_weight='best.pt'):
 
     #Load the model from torch hub
 
-    #Create weights veriable and assign path of weights model
-    path_weights = 'best.pt'
     model = torch.hub.load('ultralytics/yolov5', 'custom', path=path_weights)
 
     #Convert input directory to pathlib 
     input_dir = Path(input_dir)
+    #Create images extension list
+    images_ext = ['.JPG','.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff', '.dng']
+    #Get images list
+    image_list = []
+    for ext in images_ext:
+        image_list.extend(list(input_dir.glob('*'+ext)))
 
-    #Create image list
-    image_list = list(input_dir.glob('*.JPG'))
-
+   
 
     #Loop over the image list
     for path in tqdm(image_list[10:]):
@@ -115,14 +120,28 @@ def predict(input_dir:Path,output_dir:Path,path_weight='best.pt'):
             #Save annotations to json file
             with open(f'{output_dir}/labels/{label_id}.json','w',encoding='utf8') as f:        
                 json.dump(annotations, f, ensure_ascii=False)
-
+#Define the function to parse command line arguments
+def parse_args():
+    #Create a parser
+    parser = argparse.ArgumentParser(description='Detect objects in images')
+    #Add arguments
+    parser.add_argument('--input', type=str,required=True, help='input directory')
+    parser.add_argument('--output', type=str, default='output', help='output directory')
+    parser.add_argument('--weights', type=str, default='best.pt', help='path of weights')
+    #Return arguments
+    return parser.parse_args()
 
 #Run the main function
 if __name__ == '__main__':
-    #Input directory
-    input_dir = '/media/buntuml/DATASET/TEST_CASE/dam/wall/1'
-    #Create a dataset directory
-    output_dir = Path('dataset_json')
+    #Parse command line arguments
+    args = parse_args()
+    #Get input and output directory
+    input_dir = args.input
+    output_dir = args.output
+    #Get path of weights
+    path_weight = args.weights
+
+    #Create directory
     make_dirs(output_dir)
     #Predict bounding box
-    predict(input_dir=input_dir,output_dir=output_dir)
+    predict(input_dir=input_dir,output_dir=output_dir,path_weights=path_weight)
