@@ -93,7 +93,7 @@ for path in tqdm(image_list[10:]):
         #Loop over the prediction
         for pred in prediction.xywh[0]:
             #Get bounding box: [x_center, y_center, width, height]
-            x_center, y_center, width, height,class_id,confidence = pred
+            x_center, y_center, width, height,confidence,class_id = pred
             #Convert x_center, y_center, width, height to xywh
             x_min = int(x_center - width/2)
             y_min = int(y_center - height/2)
@@ -101,18 +101,14 @@ for path in tqdm(image_list[10:]):
             height = int(height)
             #Create a bounding box list 
             bbox = [x_min, y_min, width, height]
-            #Get class
-            class_id = int(pred[4])
-            #get confidence
-            confidence = float(pred[5])
             
             #add bounding box to annotations dictionary
             annotations["annotations"].append({
                 "id": 1,
                 "image_id": 1,
-                "category_id": class_id,
+                "category_id": str(class_id.item()),
                 "bbox": bbox,
-                "score": confidence
+                "score": float(confidence)
                 })
         #Create a label dictionary
 
