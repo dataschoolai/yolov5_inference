@@ -17,7 +17,7 @@
             "request": "launch",
             "program": "detect_json.py",
             "args":[
-                "--input","/media/buntuml/DATASET/TEST_CASE/dam/wall/1",
+                "--input","/media/buntuml/DATASET/cluster_img/103_EFFLORESCENCE_10/4",
                 "--output","dataset_json",
                 "--weights","efflorescence.pt",
 
